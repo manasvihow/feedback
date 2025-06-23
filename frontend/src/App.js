@@ -1,12 +1,15 @@
-import React from 'react'
-import LoginPage from './pages/LoginPage'
+import React from "react";
+import HomePage from "./pages/Home";
+import AuthProvider from "./services/authProvider";
 
 const App = () => {
-  return (
-    <>
-      <LoginPage />
-    </>
-  )
-}
 
-export default App
+  return ( 
+    <AuthProvider>
+      <HomePage />
+    </AuthProvider>
+    )
+};
+
+export default App;
+ 

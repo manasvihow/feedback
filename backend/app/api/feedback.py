@@ -72,7 +72,23 @@ async def get_all(email: str = Query (...)):
         raise HTTPException(status_code=403, details="Unknown role")
     return feedbacks
 
-@router.get("/{feedback_id}")
+class FeedbackPublicDTO(BaseModel):
+    created_by_email: str
+    created_by_role: str
+    is_anon: bool = False
+    employee_id: str
+    strengths: str
+    areas_to_improve: str
+    sentiment: Literal["positive", "negative", "neutral"]
+    tags: Optional[List[str]] = []
+    status: Literal["requested", "draft", "submitted", "acknowledged"]
+
+    requested_at: Optional[datetime]
+    created_at: datetime=Field(default_factory=datetime.utcnow)
+    updated_at: Optional[datetime]
+    acknowledged_at: Optional[datetime]
+
+@router.get("/{feedback_id}", response_model=List[FeedbackPublicDTO])
 async def get_feedback(feedback_id: str = Path(...), requestor_email: str = Query(...)):
     requestor = await UserDB.find_one(UserDB.email == requestor_email)
     if not requestor:

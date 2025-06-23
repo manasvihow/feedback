@@ -1,32 +1,26 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
+import { Login } from "../services/login";
+import { ROLES, UserContext } from "../services/contexts";
 
-export default function LoginPage() {
+export default function LoginPage({setUser}) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
-
+    
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrorMsg("");
 
-    try {
-      const res = await fetch("http://127.0.0.1:8000/user/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
+    const userData = await Login({
+      email,
+      password
+    }, setErrorMsg);
 
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.detail || "Login failed");
-      }
-
-      localStorage.setItem("user", JSON.stringify(data));
-      alert("Login successful");
-    } catch (err) {
-      setErrorMsg(err.message || "Something went wrong");
-    }
+    setUser({
+      email: userData.email,
+      name: userData.name,
+      role: userData.role
+    })
   };
 
   return (
