@@ -7,15 +7,15 @@ class FeedbackDB(Document):
     created_by_email: str
     created_by_role: str
     is_anon: bool = False
-    employee_id: str
+    employee_email: str
     strengths: str
     areas_to_improve: str
-    sentiment: Literal["positive", "negative", "neutral"]
+    sentiment: Optional[Literal["positive", "negative", "neutral"]] = None
     tags: Optional[List[str]] = []
     status: Literal["requested", "draft", "submitted", "acknowledged"]
 
     requested_at: Optional[datetime]
-    created_at: datetime=Field(default_factory=datetime.utcnow)
+    created_at: Optional[datetime] = None
     updated_at: Optional[datetime]
     acknowledged_at: Optional[datetime]
 

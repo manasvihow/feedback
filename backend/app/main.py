@@ -1,10 +1,11 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Depends, status
 from app.core.database import init_db
 from app.api import user
 from fastapi.middleware.cors import CORSMiddleware
 from app.api import feedback
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from typing_extensions import Annotated
+import secrets
 
 app = FastAPI(title="feedback")
 

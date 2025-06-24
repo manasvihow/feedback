@@ -59,7 +59,7 @@ async def login(credentials: UserLoginDTO):
     if not existing:
         raise HTTPException(status_code=400, detail="User does not exist, please register first")
     if not verify_password(credentials.password, existing.password_hashed):
-        raise HTTPException(status_code=401, detail="Invalid Credentials")
+        raise HTTPException(status_code=401, detail="Invalid credentials")
     
     return {"name": existing.name, "email": existing.email, "role": existing.role}
 

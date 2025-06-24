@@ -1,26 +1,28 @@
 import { useState, useContext } from "react";
 import { Login } from "../services/login";
-import { ROLES, UserContext } from "../services/contexts";
 
-export default function LoginPage({setUser}) {
+export default function LoginPage({ setUser }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
-    
+  // const [loggedIn, setLoggedIn] = useState(false);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrorMsg("");
 
-    const userData = await Login({
-      email,
-      password
-    }, setErrorMsg);
+    try {
+      const userData = await Login({ email, password });
 
-    setUser({
-      email: userData.email,
-      name: userData.name,
-      role: userData.role
-    })
+      setUser({
+        email: userData.email,
+        name: userData.name,
+        role: userData.role,
+      });
+      // setLoggedIn(true);
+    } catch (err) {
+      setErrorMsg(err.message || "Something went wrong");
+    }
   };
 
   return (

@@ -1,89 +1,34 @@
-import * as React from 'react';
-import { styled, alpha } from '@mui/material/styles';
-import AppBar from '@mui/material/AppBar';
-import Box from '@mui/material/Box';
-import Toolbar from '@mui/material/Toolbar';
-import IconButton from '@mui/material/IconButton';
-import Typography from '@mui/material/Typography';
-import InputBase from '@mui/material/InputBase';
-import MenuIcon from '@mui/icons-material/Menu';
-import SearchIcon from '@mui/icons-material/Search';
+import { useContext } from 'react';
+import { UserContext } from '../services/contexts';
 
-const Search = styled('div')(({ theme }) => ({
-  position: 'relative',
-  borderRadius: theme.shape.borderRadius,
-  backgroundColor: alpha(theme.palette.common.white, 0.15),
-  '&:hover': {
-    backgroundColor: alpha(theme.palette.common.white, 0.25),
-  },
-  marginLeft: 0,
-  width: '100%',
-  [theme.breakpoints.up('sm')]: {
-    marginLeft: theme.spacing(1),
-    width: 'auto',
-  },
-}));
-
-const SearchIconWrapper = styled('div')(({ theme }) => ({
-  padding: theme.spacing(0, 2),
-  height: '100%',
-  position: 'absolute',
-  pointerEvents: 'none',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-}));
-
-const StyledInputBase = styled(InputBase)(({ theme }) => ({
-  color: 'inherit',
-  width: '100%',
-  '& .MuiInputBase-input': {
-    padding: theme.spacing(1, 1, 1, 0),
-    // vertical padding + font size from searchIcon
-    paddingLeft: `calc(1em + ${theme.spacing(4)})`,
-    transition: theme.transitions.create('width'),
-    [theme.breakpoints.up('sm')]: {
-      width: '12ch',
-      '&:focus': {
-        width: '20ch',
-      },
-    },
-  },
-}));
-
-export default function SearchAppBar() {
+export default function NavBar({ onHomeClick, onLogout }) {
   return (
-    <Box sx={{ flexGrow: 1 }}>
-      <AppBar position="static">
-        <Toolbar>
-          <IconButton
-            size="large"
-            edge="start"
-            color="inherit"
-            aria-label="open drawer"
-            sx={{ mr: 2 }}
+    <nav className="w-full px-6 py-3 bg-white border-b border-gray-100 shadow-sm">
+      <div className="max-w-7xl mx-auto flex items-center justify-between">
+        {/* Logo/Title - clickable for home */}
+        <div 
+          className="text-2xl font-semibold text-[#5C2849] tracking-tight cursor-pointer hover:opacity-80 transition-opacity"
+          onClick={onHomeClick}
+        >
+          FeedLoop
+        </div>
+
+        {/* Navigation Actions */}
+        <div className="flex items-center gap-4">
+          <button
+            onClick={onHomeClick}
+            className="text-[#555555] hover:text-[#5C2849] font-medium px-3 py-1 rounded-md transition-colors"
           >
-            <MenuIcon />
-          </IconButton>
-          <Typography
-            variant="h6"
-            noWrap
-            component="div"
-            sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}
+            Home
+          </button>
+          <button
+            onClick={onLogout}
+            className="text-[#A63A3A] hover:text-white hover:bg-[#A63A3A] font-medium px-3 py-1 rounded-md border border-[#A63A3A] hover:border-transparent transition-colors"
           >
-            MUI
-          </Typography>
-          <Search>
-            <SearchIconWrapper>
-              <SearchIcon />
-            </SearchIconWrapper>
-            <StyledInputBase
-              placeholder="Search…"
-              inputProps={{ 'aria-label': 'search' }}
-            />
-          </Search>
-        </Toolbar>
-      </AppBar>
-    </Box>
+            Logout
+          </button>
+        </div>
+      </div>
+    </nav>
   );
 }
