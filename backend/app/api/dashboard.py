@@ -84,14 +84,14 @@ async def get_team_members(user_email: str = Query(...)):
         raise HTTPException(status_code=404, detail="User not found")
 
     # find the team this user belongs to
-    team = await TeamDB.find_one({"member_emails": user.email})
+    team = await TeamDB.find_one({ "$or" : [{"member_emails": user.email}, {"manager_email": user.email}]})
     if not team:
         raise HTTPException(status_code=404, detail="User is not part of any team")
 
     # get all member and manager emails
     all_emails = list(set(team.member_emails + [team.manager_email]))
+    all_emails = filter(lambda email: email != user_email, all_emails)
     users = await UserDB.find({"email": {"$in": all_emails}}).to_list()
-
 
     return [
         TeamMemberDTO(
@@ -142,4 +142,47 @@ async def get_feedback_timeline(email: str = Query(...)):
 
     return timeline
 
+class FeedBackAllAnalyticsDTO(BaseModel):
+    id: str
+    employee_name: str
+    sentiment: Optional[Literal["positive", "neutral", "negative"]] = None
+    status: Literal["requested", "draft", "submitted", "acknowledged"]
+    tags: Optional[List[str]]
+    created_at: Optional[datetime]
+
+@router.get("/all-analytics", response_model=List[FeedBackAllAnalyticsDTO])
+async def get_all_analytics(user_email: str):
+    user = await UserDB.find_one(UserDB.email == user_email)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    if user.role != "manager":
+        raise HTTPException(status_code=403, detail="User is not a manager")
+
+    team = await get_team_members(user_email)
+
+    team_map = {}
+
+    for t in team:
+        team_map[t.email] = t
+
+    print(team_map)
+    
+    raw_feedbacks = await FeedbackDB.find(FeedbackDB.created_by_email == user.email).to_list()
+
+    dto_list = []
+
+    for fb in raw_feedbacks:
+        dto = FeedBackAllAnalyticsDTO(
+            id=str(fb.id),
+            employee_name=team_map[fb.employee_email].name,
+            sentiment=fb.sentiment,
+            status=fb.status,
+            tags=fb.tags,
+            created_at=fb.created_at
+        )
+
+        dto_list.append(dto)
+
+    return dto_list
 

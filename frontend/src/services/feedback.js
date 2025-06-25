@@ -61,3 +61,20 @@ export async function requestFeedback(data) {
 
   return res.json();
 }
+
+export async function acknowledge(email, feedbackId){
+  const res = await fetch(`http://localhost:8000/feedback/${feedbackId}/acknowledge`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({employee_email: email}),
+  });
+
+  if (!res.ok) {
+    const errorData = await res.json();
+    throw { response: { data: errorData } };
+  }
+
+  return res.json();
+}

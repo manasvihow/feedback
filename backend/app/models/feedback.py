@@ -15,7 +15,7 @@ class FeedbackDB(Document):
     status: Literal["requested", "draft", "submitted", "acknowledged"]
 
     requested_at: Optional[datetime]
-    created_at: Optional[datetime] = None
+    created_at: Optional[datetime]
     updated_at: Optional[datetime]
     acknowledged_at: Optional[datetime]
 

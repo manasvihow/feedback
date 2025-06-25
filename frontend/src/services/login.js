@@ -10,7 +10,6 @@ export const Login = async ({ email, password }) => {
   if (!res.ok) {
     throw new Error(data.detail || "Login failed");
   }
-
-  alert("Login successful");
+  
   return data;
 };

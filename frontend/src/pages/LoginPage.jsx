@@ -14,11 +14,15 @@ export default function LoginPage({ setUser }) {
     try {
       const userData = await Login({ email, password });
 
-      setUser({
+      const loggedInUser = {
         email: userData.email,
         name: userData.name,
         role: userData.role,
-      });
+      }
+      setUser(loggedInUser);
+
+      localStorage.setItem("user", JSON.stringify(loggedInUser))
+
       // setLoggedIn(true);
     } catch (err) {
       setErrorMsg(err.message || "Something went wrong");

@@ -5,8 +5,4 @@ export const ROLES = {
     "employee": "employee"
 }
 
-export const UserContext = createContext({
-    name: "",
-    role: ROLES.employee,
-    email: ""
-});
+export const UserContext = createContext();

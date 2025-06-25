@@ -4,26 +4,24 @@ import { UserContext } from "../services/contexts";
 import CreateFeedbackForm from "./CreateFeedbackForm";
 
 export default function FeedbackTable({
-  requestorEmail,
-  setRequestorEmail,
-  setCreate,
-  setSelectedId,
+  setSelectedFeedback,
+  setCreate
 }) {
-  const { email, role } = useContext(UserContext);
+  const { user } = useContext(UserContext);
   const [feedbacks, setFeedbacks] = useState([]);
   const [error, setError] = useState("");
 
   useEffect(() => {
     async function fetchData() {
       try {
-        const data = await getFeedbackList(email);
+        const data = await getFeedbackList(user?.email);
         setFeedbacks(data);
       } catch (err) {
         setError(err.message);
       }
     }
     fetchData();
-  }, [email]);
+  }, [user?.email]);
 
   const sentimentColors = {
     positive: { bg: "bg-[#D5EDD9]", text: "text-[#2A5C3A]" },
@@ -50,7 +48,7 @@ export default function FeedbackTable({
         <table className="w-full text-sm">
           <thead className="bg-[#F9F9F9]">
             <tr className="uppercase text-xs tracking-wider text-[#555555]">
-              <th className="p-4 text-left font-medium">Name</th>
+              <th className="p-4 text-left font-medium">{user.role === "manager" ? "Employee " : ""}Name</th>
               <th className="p-4 text-left font-medium">Feedback</th>
               <th className="p-4 text-left font-medium">Sentiment</th>
               <th className="p-4 text-left font-medium">Status</th>
@@ -63,22 +61,20 @@ export default function FeedbackTable({
                 className="border-t border-gray-100 hover:bg-[#FAFAFA] transition-colors duration-150"
               >
                 <td className="p-4 font-medium">
-                  {role === "manager" ? fb.employee_name : fb.creator_name}
+                  {user?.role === "manager" ? fb.employee_name : fb.creator_name}
                 </td>
                 <td
                   className={`p-4 text-[#D95B43] hover:text-[#B35930] ${
-                    fb.status === "requested"
-                      ? "pointer-events-none"
-                      : " hover:underline cursor-pointer"
+                     "hover:underline cursor-pointer"
                   } transition-colors`}
                   onClick={() => {
-                    setSelectedId(fb.id);
+                    setSelectedFeedback(fb);
+                    setCreate((["draft", "requested"].includes(fb.status) && user.email == fb.creator_email)? true : false )
                   }}
                 >
-                  {fb.status === "requested"
-                    ? ""
-                    : fb.preview?.slice(0, 50) +
-                      (fb.preview?.length > 50 && "...")}
+                  {fb.status === "requested" && user.email == fb.creator_email
+                    ? "Give Feedback"
+                    : fb.preview}
                 </td>
                 <td className="p-4">
                   <span

@@ -12,6 +12,7 @@ router = APIRouter(prefix="/feedback", tags=["feedback"])
 
 #creating feedbacks 
 class FeedbackCreate(BaseModel):
+    feedbackId: Optional[str]
     created_by_email: str
     employee_email: str
     strengths: str
@@ -28,7 +29,7 @@ async def create_feedback(data: FeedbackCreate):
     if not creator:
         raise HTTPException(status_code=404, detail="Creator not found")
     
-    creator_team = await TeamDB.find_one(TeamDB.manager_email == creator.email)
+    creator_team = await TeamDB.find_one({ "$or" : [{"member_emails": creator.email}, {"manager_email": creator.email}]})
     
     employee = await UserDB.find_one(UserDB.email == data.employee_email)
     if not employee:
@@ -44,23 +45,20 @@ async def create_feedback(data: FeedbackCreate):
         raise HTTPException(status_code=400, detail="Cannot send feedback to yourself")
 
 
-    existing = await FeedbackDB.find_one(
-        (FeedbackDB.created_by_email == creator.email),
-        (FeedbackDB.employee_email == employee.email),
-        (FeedbackDB.status == "requested")
-    )
+    if data.feedbackId != "":
+        existing = await FeedbackDB.get(data.feedbackId)
 
-    if existing:
-        existing.strengths = data.strengths
-        existing.areas_to_improve = data.areas_to_improve
-        existing.sentiment = data.sentiment
-        existing.tags = data.tags
-        existing.status = data.status
-        existing.is_anon = data.is_anon
-        existing.created_at = datetime.utcnow()
-        existing.updated_at = datetime.utcnow()
-        await existing.save()
-        return {"message": "requested feedback submitted successfully", "id": str(existing.id)}
+        if existing:
+            existing.strengths = data.strengths
+            existing.areas_to_improve = data.areas_to_improve
+            existing.sentiment = data.sentiment
+            existing.tags = data.tags
+            existing.status = data.status
+            existing.is_anon = data.is_anon
+            existing.created_at = datetime.utcnow()
+            existing.updated_at = datetime.utcnow()
+            await existing.save()
+            return {"message": "requested feedback submitted successfully", "id": str(existing.id)}
 
     feedback = FeedbackDB(
         created_by_email=creator.email,
@@ -87,6 +85,8 @@ class FeedbackListDTO(BaseModel):
     id: str
     employee_name: str
     creator_name: str
+    creator_email: str
+    employee_email: str
     sentiment: Optional[Literal["positive", "negative", "neutral"]]
     status: Literal["requested", "draft", "submitted", "acknowledged"]
     preview: str  
@@ -102,7 +102,7 @@ async def get_all(email: str = Query(...)):
     if user.role == "manager":
         raw_feedbacks = await FeedbackDB.find(FeedbackDB.created_by_email == user.email).to_list()
     elif user.role == "employee":
-        raw_feedbacks = await FeedbackDB.find(FeedbackDB.employee_email == user.email).to_list()
+        raw_feedbacks = await FeedbackDB.find({ "$or": [{ FeedbackDB.employee_email: user.email}, { FeedbackDB.created_by_email: user.email}]}).to_list()
     else:
         raise HTTPException(status_code=404, detail="User not found")
     
@@ -110,23 +110,28 @@ async def get_all(email: str = Query(...)):
 
     for fb in raw_feedbacks:
         # skip draft feedbacks for employee
-        if user.role == "employee" and fb.status == "draft":
+        if user.email == fb.employee_email and fb.status == "draft":
             continue
 
         # determine names
         employee_name = ""
-        creator_name = "Anonymous" if fb.is_anon else "Unknown"
+        creator_name = "Anonymous" if fb.is_anon else fb.created_by_email
+        creator_email = ""
+        employee_email = fb.employee_email
 
         if user.role == "manager":
             employee = await UserDB.find_one(UserDB.email == fb.employee_email)
             employee_name = employee.name if employee else "Invalid"
+            creator_name = user.name
+            creator_email = user.email
         elif user.role == "employee":
             creator = await UserDB.find_one(UserDB.email == fb.created_by_email)
             creator_name = creator.name if creator else "Invalid"
+            creator_email = fb.created_by_email
 
         # prepare preview
         if fb.status == "requested":
-            preview = "Create Feedback"
+            preview = ""
         else:
             strengths = fb.strengths or ""
             preview = strengths[:60] + ("..." if len(strengths) > 60 else "")
@@ -134,7 +139,9 @@ async def get_all(email: str = Query(...)):
         dto = FeedbackListDTO(
             id=str(fb.id),
             employee_name=employee_name,
+            employee_email=employee_email,
             creator_name=creator_name,
+            creator_email=creator_email,
             sentiment=fb.sentiment,
             status=fb.status,
             preview=preview,
@@ -158,7 +165,7 @@ class FeedbackPublicDTO(BaseModel):
     status: Literal["requested", "draft", "submitted", "acknowledged"]
 
     requested_at: Optional[datetime]
-    created_at: datetime=Field(default_factory=datetime.utcnow)
+    created_at: Optional[datetime]
     updated_at: Optional[datetime]
     acknowledged_at: Optional[datetime]
 
@@ -194,7 +201,9 @@ async def acknowledge_feedback(feedback_id: str = Path(...), employee_email: str
     employee = await UserDB.find_one(UserDB.email == employee_email)
     if not employee:
         raise HTTPException(status_code=404, detail="Employee not found")
-     
+    
+
+    
     feedback = await FeedbackDB.get(feedback_id)
     if not feedback:
         raise HTTPException(status_code=404, detail="Feedback not found")
@@ -287,23 +296,22 @@ async def save_feedback_draft(data: FeedbackCreate):
         raise HTTPException(status_code=400, detail="Cannot send feedback to yourself")
 
     # Save as draft (overwrite if a draft exists)
-    existing_draft = await FeedbackDB.find_one(
-        FeedbackDB.created_by_email == creator.email,
-        FeedbackDB.employee_email == employee.email,
-        FeedbackDB.status == "draft"
-    )
+    if data.feedbackId != "":
+        existing_draft = await FeedbackDB.get(data.feedbackId)
 
-    if existing_draft:
-        existing_draft.strengths = data.strengths
-        existing_draft.areas_to_improve = data.areas_to_improve
-        existing_draft.sentiment = data.sentiment
-        existing_draft.tags = data.tags
-        existing_draft.is_anon = data.is_anon
-        existing_draft.updated_at = datetime.utcnow()
-        await existing_draft.save()
-        return {"message": "draft updated", "id": str(existing_draft.id)}
+        if existing_draft:
+            await existing_draft.set({
+                FeedbackDB.strengths : data.strengths,
+                FeedbackDB.areas_to_improve : data.areas_to_improve,
+                FeedbackDB.sentiment : data.sentiment,
+                FeedbackDB.tags : data.tags,
+                FeedbackDB.is_anon : data.is_anon,
+                FeedbackDB.updated_at : datetime.utcnow(),
+                FeedbackDB.status: "draft"
+            })
 
-    
+            return {"message": "draft updated", "id": str(existing_draft.id)}
+
     feedback = FeedbackDB(
         created_by_email=creator.email,
         created_by_role=creator.role,

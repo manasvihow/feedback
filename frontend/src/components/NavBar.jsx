@@ -1,5 +1,3 @@
-import { useContext } from 'react';
-import { UserContext } from '../services/contexts';
 
 export default function NavBar({ onHomeClick, onLogout }) {
   return (

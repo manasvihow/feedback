@@ -4,17 +4,13 @@ import { ROLES, UserContext } from "./contexts";
 import { useState } from "react";
 
 const AuthProvider = ({children}) => {
-    const [user, setUser] = useState({
-        email: "",
-        name: "",
-        role: ROLES.manager
-    });
+    const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
 
     return (
-        user.email === "" ? <LoginPage setUser={setUser}/> :
-        <UserContext.Provider value={user} setUser={setUser} >
-            {children}
-        </UserContext.Provider>
+        user?.email ? <UserContext.Provider value={{user, setUser}}>
+        {children}
+    </UserContext.Provider> : <LoginPage setUser={setUser}/>
+        
     )
 }
 

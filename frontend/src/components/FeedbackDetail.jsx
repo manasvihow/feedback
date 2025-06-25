@@ -1,12 +1,12 @@
 import { useEffect, useState, useRef, useContext } from "react";
-import { getFeedbackById } from "../services/feedback";
+import { acknowledge, getFeedbackById } from "../services/feedback";
 import html2pdf from "html2pdf.js";
 import ReactMarkdown from "react-markdown";
 import { UserContext } from "../services/contexts";
 
 export default function FeedbackDetail({ id, onBack }) {
-  const user = useContext(UserContext);
-  const email = user.email;
+  const {user} = useContext(UserContext);
+  const email = user?.email;
   const [feedback, setFeedback] = useState(null);
   const [error, setError] = useState("");
   const pdfRef = useRef();
@@ -168,6 +168,15 @@ export default function FeedbackDetail({ id, onBack }) {
           </div>
         </div>
       )}
+      {feedback.employee_email === user?.email && feedback.status !== "acknowledged" &&
+        <button
+          className="px-4 py-2 bg-[#5D4E6D] text-white rounded-lg hover:bg-[#4A3D56] text-sm"
+          onClick={() => {
+            acknowledge(user.email, id)
+          }}
+        >
+          Acknowledge
+        </button>}
     </div>
   );
 }
