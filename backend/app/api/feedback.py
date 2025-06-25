@@ -4,6 +4,7 @@ from pydantic import BaseModel, Field
 from typing import Literal, Optional, List
 from datetime import datetime
 from app.models.user import UserDB
+from app.models.team import TeamDB
 
 router = APIRouter(prefix="/feedback", tags=["feedback"])
 
@@ -23,13 +24,20 @@ class FeedbackCreate(BaseModel):
 @router.post("/create", response_model=dict)
 async def create_feedback(data: FeedbackCreate):
     creator = await UserDB.find_one(UserDB.email == data.created_by_email)
+
     if not creator:
         raise HTTPException(status_code=404, detail="Creator not found")
+    
+    creator_team = await TeamDB.find_one(TeamDB.manager_email == creator.email)
     
     employee = await UserDB.find_one(UserDB.email == data.employee_email)
     if not employee:
         raise HTTPException(status_code=404, detail="Employee not found")
 
+    employee_team = await TeamDB.find_one(TeamDB.member_emails == employee.email)
+
+    if employee_team != creator_team:
+        raise HTTPException(status_code=400, detail="You can only send feedbacks to your team members")
     if creator.role == "manager" and data.is_anon:
         raise HTTPException(status_code=400, detail="Managers can't send anonymous feedback")
     if creator.role == "employee" and data.created_by_email == data.employee_email:
@@ -101,35 +109,40 @@ async def get_all(email: str = Query(...)):
     name_feedbacks = []
 
     for fb in raw_feedbacks:
-        employee_name = "Unknown"
+        # skip draft feedbacks for employee
+        if user.role == "employee" and fb.status == "draft":
+            continue
+
+        # determine names
+        employee_name = ""
         creator_name = "Anonymous" if fb.is_anon else "Unknown"
 
         if user.role == "manager":
-            employee_email = fb.employee_email
-            employee = await UserDB.find_one(UserDB.email == employee_email)
+            employee = await UserDB.find_one(UserDB.email == fb.employee_email)
             employee_name = employee.name if employee else "Invalid"
-        if user.role == "employee":
-            creator_email = fb.created_by_email
-            creator = await UserDB.find_one(UserDB.email == creator_email)
+        elif user.role == "employee":
+            creator = await UserDB.find_one(UserDB.email == fb.created_by_email)
             creator_name = creator.name if creator else "Invalid"
 
-        status = fb.status 
-        if status == "requested":
+        # prepare preview
+        if fb.status == "requested":
             preview = "Create Feedback"
-        else: 
+        else:
             strengths = fb.strengths or ""
             preview = strengths[:60] + ("..." if len(strengths) > 60 else "")
-
+        
         dto = FeedbackListDTO(
-            id = str(fb.id),
-            employee_name = employee_name,
-            creator_name = creator_name,
-            sentiment = fb.sentiment,
-            status = fb.status,
-            preview = preview,
+            id=str(fb.id),
+            employee_name=employee_name,
+            creator_name=creator_name,
+            sentiment=fb.sentiment,
+            status=fb.status,
+            preview=preview,
         )
         name_feedbacks.append(dto)
+
     return name_feedbacks
+
     
         
 #getting a single feedback for detailed view
@@ -221,6 +234,14 @@ async def request_feedback(data: FeedbackRequestDTO):
 
     if giver.email == requestor.email:
         raise HTTPException(status_code=400, detail="Cannot request feedback from yourself")
+    
+    requestor_team = await TeamDB.find_one(TeamDB.member_emails == requestor.email)
+    giver_team = await TeamDB.find_one(TeamDB.manager_email == giver.email)
+    if not giver_team:
+        giver_team = await TeamDB.find_one(TeamDB.member_emails == giver.email)
+
+    if requestor_team != giver_team:
+        raise HTTPException(status_code=400, detail="You can only request feedback from your team members")
 
     existing = await FeedbackDB.find_one(
         FeedbackDB.created_by_email == giver.email,

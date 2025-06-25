@@ -3,13 +3,13 @@ import { submitFeedback } from "../services/feedback";
 import { UserContext } from "../services/contexts";
 import ReactMarkdown from "react-markdown";
 
-export default function CreateFeedbackForm({ onClose }) {
+export default function CreateFeedbackForm({ setRequestorEmail, requestorEmail, onClose }) {
   const { email: created_by_email } = useContext(UserContext);
   const strengthsTextareaRef = useRef(null);
   const improvementsTextareaRef = useRef(null);
 
   const [form, setForm] = useState({
-    employee_email: "",
+    employee_email: requestorEmail,
     strengths: "",
     areas_to_improve: "",
     sentiment: "positive",
@@ -61,11 +61,14 @@ export default function CreateFeedbackForm({ onClose }) {
         setTimeout(() => {
           onClose();
           setSuccess("");
+          setRequestorEmail("");
         }, 1500);
       }
     } catch (err) {
       setError(err.message);
     }
+    
+    
   };
 
   return (

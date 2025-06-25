@@ -1,8 +1,11 @@
 from fastapi import FastAPI, HTTPException, Depends, status
 from app.core.database import init_db
-from app.api import user
 from fastapi.middleware.cors import CORSMiddleware
+from app.api import user
 from app.api import feedback
+from app.api import dashboard
+from app.api import team
+
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from typing_extensions import Annotated
 import secrets
@@ -41,7 +44,10 @@ app.add_middleware(
 )
    
 app.include_router(user.router)
+app.include_router(team.router)
 app.include_router(feedback.router)
+app.include_router(dashboard.router)
+
 
 @app.on_event("startup")
 async def start_db():

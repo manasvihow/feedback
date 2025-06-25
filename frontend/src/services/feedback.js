@@ -44,3 +44,20 @@ export async function submitFeedback(payload) {
 
   return await res.json();
 }
+
+export async function requestFeedback(data) {
+  const res = await fetch("http://localhost:8000/feedback/request", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (!res.ok) {
+    const errorData = await res.json();
+    throw { response: { data: errorData } };
+  }
+
+  return res.json();
+}

@@ -1,7 +1,9 @@
 from beanie import init_beanie
 from motor.motor_asyncio import AsyncIOMotorClient
 from app.models.user import UserDB
+from app.models.team import TeamDB
 from app.models.feedback import FeedbackDB
+
 import os
 from dotenv import load_dotenv
 
@@ -15,6 +17,7 @@ async def init_db():
         database = db,
         document_models = [
             UserDB,
-            FeedbackDB
+            FeedbackDB,
+            TeamDB
         ]
     )

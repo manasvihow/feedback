@@ -1,12 +1,30 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useContext } from "react";
 import { getFeedbackById } from "../services/feedback";
 import html2pdf from "html2pdf.js";
 import ReactMarkdown from "react-markdown";
+import { UserContext } from "../services/contexts";
 
-export default function FeedbackDetail({ id, email, onBack }) {
+export default function FeedbackDetail({ id, onBack }) {
+  const user = useContext(UserContext);
+  const email = user.email;
   const [feedback, setFeedback] = useState(null);
   const [error, setError] = useState("");
   const pdfRef = useRef();
+
+  const statusColors = {
+    requested: { bg: "bg-[#E8E0F2]", text: "text-[#4A2C82]" },
+    draft: { bg: "bg-[#F5E9D2]", text: "text-[#8C6A3D]" },
+    submitted: { bg: "bg-[#D9EDE5]", text: "text-[#1E6B52]" },
+    acknowledged: { bg: "bg-[#FCE8D5]", text: "text-[#B35930]" },
+    default: { bg: "bg-gray-100", text: "text-gray-600" },
+  };
+
+  const sentimentColors = {
+    positive: { bg: "bg-[#D5EDD9]", text: "text-[#2A5C3A]" },
+    neutral: { bg: "bg-[#E8E3D9]", text: "text-[#5A5A5A]" },
+    negative: { bg: "bg-[#F8D7D3]", text: "text-[#A63A3A]" },
+    default: { bg: "bg-gray-100", text: "text-gray-600" },
+  };
 
   useEffect(() => {
     async function fetchFeedback() {
@@ -90,10 +108,28 @@ export default function FeedbackDetail({ id, email, onBack }) {
           <strong>To:</strong> {feedback.employee_email}
         </p>
         <p>
-          <strong>Status:</strong> {feedback.status}
+          <strong>Status:</strong>{" "}
+          <span
+            className={`px-3 py-1 rounded-full text-xs font-medium ${
+              (statusColors[feedback.status] || statusColors.default).bg
+            } ${(statusColors[feedback.status] || statusColors.default).text}`}
+          >
+            {feedback.status}
+          </span>
         </p>
         <p>
-          <strong>Sentiment:</strong> {feedback.sentiment}
+          <strong>Sentiment:</strong>{" "}
+          <span
+            className={`px-3 py-1 rounded-full text-xs font-medium ${
+              (sentimentColors[feedback.sentiment] || sentimentColors.default)
+                .bg
+            } ${
+              (sentimentColors[feedback.sentiment] || sentimentColors.default)
+                .text
+            }`}
+          >
+            {feedback.sentiment}
+          </span>
         </p>
       </div>
 

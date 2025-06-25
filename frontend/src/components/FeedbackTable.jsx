@@ -1,8 +1,14 @@
 import { useEffect, useState, useContext } from "react";
 import { getFeedbackList } from "../services/feedback";
 import { UserContext } from "../services/contexts";
+import CreateFeedbackForm from "./CreateFeedbackForm";
 
-export default function FeedbackTable({ setSelectedId }) {
+export default function FeedbackTable({
+  requestorEmail,
+  setRequestorEmail,
+  setCreate,
+  setSelectedId,
+}) {
   const { email, role } = useContext(UserContext);
   const [feedbacks, setFeedbacks] = useState([]);
   const [error, setError] = useState("");
@@ -19,12 +25,11 @@ export default function FeedbackTable({ setSelectedId }) {
     fetchData();
   }, [email]);
 
-  // Color configuration object for maintainability
   const sentimentColors = {
     positive: { bg: "bg-[#D5EDD9]", text: "text-[#2A5C3A]" },
     neutral: { bg: "bg-[#E8E3D9]", text: "text-[#5A5A5A]" },
     negative: { bg: "bg-[#F8D7D3]", text: "text-[#A63A3A]" },
-    default: { bg: "bg-gray-100", text: "text-gray-600" }
+    default: { bg: "bg-gray-100", text: "text-gray-600" },
   };
 
   const statusColors = {
@@ -32,12 +37,14 @@ export default function FeedbackTable({ setSelectedId }) {
     draft: { bg: "bg-[#F5E9D2]", text: "text-[#8C6A3D]" },
     submitted: { bg: "bg-[#D9EDE5]", text: "text-[#1E6B52]" },
     acknowledged: { bg: "bg-[#FCE8D5]", text: "text-[#B35930]" },
-    default: { bg: "bg-gray-100", text: "text-gray-600" }
+    default: { bg: "bg-gray-100", text: "text-gray-600" },
   };
 
   return (
     <div className="font-sans">
-      {error && <div className="text-red-500 mb-4 p-2 rounded bg-red-50">{error}</div>}
+      {error && (
+        <div className="text-red-500 mb-4 p-2 rounded bg-red-50">{error}</div>
+      )}
 
       <div className="rounded-xl shadow-sm overflow-hidden border border-gray-100 bg-white">
         <table className="w-full text-sm">
@@ -59,18 +66,28 @@ export default function FeedbackTable({ setSelectedId }) {
                   {role === "manager" ? fb.employee_name : fb.creator_name}
                 </td>
                 <td
-                  className="p-4 text-[#D95B43] hover:text-[#B35930] hover:underline cursor-pointer transition-colors"
-                  onClick={() => setSelectedId(fb.id)}
+                  className={`p-4 text-[#D95B43] hover:text-[#B35930] ${
+                    fb.status === "requested"
+                      ? "pointer-events-none"
+                      : " hover:underline cursor-pointer"
+                  } transition-colors`}
+                  onClick={() => {
+                    setSelectedId(fb.id);
+                  }}
                 >
-                  {(fb.preview || "").slice(0, 50)}
-                  {fb.preview?.length > 50 && "..."}
+                  {fb.status === "requested"
+                    ? ""
+                    : fb.preview?.slice(0, 50) +
+                      (fb.preview?.length > 50 && "...")}
                 </td>
                 <td className="p-4">
                   <span
                     className={`px-3 py-1 rounded-full text-xs font-medium ${
-                      (sentimentColors[fb.sentiment] || sentimentColors.default).bg
+                      (sentimentColors[fb.sentiment] || sentimentColors.default)
+                        .bg
                     } ${
-                      (sentimentColors[fb.sentiment] || sentimentColors.default).text
+                      (sentimentColors[fb.sentiment] || sentimentColors.default)
+                        .text
                     }`}
                   >
                     {fb.sentiment}
