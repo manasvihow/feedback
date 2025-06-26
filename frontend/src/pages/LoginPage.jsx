@@ -75,6 +75,9 @@ export default function LoginPage({ setUser }) {
         >
           Login
         </button>
+        <div className="flex float-end">
+        <a href="/" className="text-blue-400">Forgot Password?</a>
+        </div>
       </form>
     </div>
   );

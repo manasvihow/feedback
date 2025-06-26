@@ -1,5 +1,5 @@
 import { useEffect, useState, useContext } from "react";
-import { getFeedbackList } from "../services/feedback";
+import { deleteFeedback, getFeedbackList } from "../services/feedback";
 import { UserContext } from "../services/contexts";
 import CreateFeedbackForm from "./CreateFeedbackForm";
 
@@ -22,6 +22,20 @@ export default function FeedbackTable({
     }
     fetchData();
   }, [user?.email]);
+
+  const handleDelete = (id) => {
+    async function deleteFB(){
+      try{
+        await deleteFeedback(id);
+        const data = await getFeedbackList(user?.email);
+        setFeedbacks(data);
+      } catch (err) {
+        setError(err.message)
+      }
+    }
+
+    deleteFB();
+  }
 
   const sentimentColors = {
     positive: { bg: "bg-[#D5EDD9]", text: "text-[#2A5C3A]" },
@@ -52,6 +66,7 @@ export default function FeedbackTable({
               <th className="p-4 text-left font-medium">Feedback</th>
               <th className="p-4 text-left font-medium">Sentiment</th>
               <th className="p-4 text-left font-medium">Status</th>
+              <th className="p-4 text-left font-medium w-12">Action</th>
             </tr>
           </thead>
           <tbody className="text-[#444444]">
@@ -99,6 +114,13 @@ export default function FeedbackTable({
                   >
                     {fb.status}
                   </span>
+                </td>
+                <td className="p-4">
+                   {fb.status === "draft" &&  <div>
+                      <button className="font-bold text-red-600" onClick={() => {
+                        handleDelete(fb.id)
+                      }}>Delete</button>
+                    </div>}
                 </td>
               </tr>
             ))}

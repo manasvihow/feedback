@@ -78,3 +78,19 @@ export async function acknowledge(email, feedbackId){
 
   return res.json();
 }
+
+export async function deleteFeedback(feedbackId){
+  const res = await fetch(`http://localhost:8000/feedback/${feedbackId}`, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+    }
+  });
+
+  if (!res.ok) {
+    const errorData = await res.json();
+    throw { response: { data: errorData } };
+  }
+
+  return res.json();
+}

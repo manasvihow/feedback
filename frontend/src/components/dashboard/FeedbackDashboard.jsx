@@ -30,7 +30,7 @@ const FeedbackDashboard = ({feedbackAnalytics}) => {
       <div className="p-4 grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-6">
         {/* Summary Cards */}
         <div className="col-span-2"><Card emp={{name: "Total Feedback", role: total, email:""}} /></div>
-        <div className="col-span-2"><Card emp={{name: "Submitted", role: submitted, email:""}}/></div>
+        <div className="col-span-2"><Card emp={{name: "Submitted", role: submitted || "0", email:""}}/></div>
         <div className="col-span-2"><Card emp={{name: "Drafts", role: draft, email:""}} /></div>
   
         {/* Sentiment Pie Chart */}

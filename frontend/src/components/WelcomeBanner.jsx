@@ -12,9 +12,9 @@ export default function WelcomeBanner() {
     }
     return "Welcome to FeedLoop.";
   };
-
+  
   return (
-    <div className="w-full px-6 py-5 mb-6 bg-white rounded-xl shadow-sm border border-gray-100">
+    <div className="w-full mt-12 px-6 py-5 mb-6 bg-white rounded-xl shadow-sm border border-gray-100">
       <h1 className="text-2xl font-semibold text-[#5C2849]">  {/* Deep Plum */}
         Welcome{user?.name ? `, ${user?.name}` : ""}
       </h1>

@@ -55,7 +55,6 @@ async def create_feedback(data: FeedbackCreate):
             existing.tags = data.tags
             existing.status = data.status
             existing.is_anon = data.is_anon
-            existing.created_at = datetime.utcnow()
             existing.updated_at = datetime.utcnow()
             await existing.save()
             return {"message": "requested feedback submitted successfully", "id": str(existing.id)}
@@ -86,6 +85,8 @@ class FeedbackListDTO(BaseModel):
     employee_name: str
     creator_name: str
     creator_email: str
+    created_at: Optional[datetime]
+    updated_at: Optional[datetime]
     employee_email: str
     sentiment: Optional[Literal["positive", "negative", "neutral"]]
     status: Literal["requested", "draft", "submitted", "acknowledged"]
@@ -145,9 +146,14 @@ async def get_all(email: str = Query(...)):
             sentiment=fb.sentiment,
             status=fb.status,
             preview=preview,
+            created_at=fb.created_at,
+            updated_at=fb.updated_at
         )
         name_feedbacks.append(dto)
 
+    print(name_feedbacks)
+
+    name_feedbacks.sort(key=lambda x: x.updated_at)
     return name_feedbacks
 
     
@@ -273,8 +279,8 @@ async def request_feedback(data: FeedbackRequestDTO):
         tags=data.tags,
         status="requested",
         requested_at=datetime.utcnow(),
-        created_at=None,
-        updated_at=None,
+        created_at=datetime.utcnow(),
+        updated_at=datetime.utcnow(),
         acknowledged_at=None,
     )
     await feedback.insert()
@@ -295,6 +301,8 @@ async def save_feedback_draft(data: FeedbackCreate):
     if creator.role == "employee" and data.created_by_email == data.employee_email:
         raise HTTPException(status_code=400, detail="Cannot send feedback to yourself")
 
+    # if a draft already exists don't create a new one
+
     # Save as draft (overwrite if a draft exists)
     if data.feedbackId != "":
         existing_draft = await FeedbackDB.get(data.feedbackId)
@@ -311,6 +319,14 @@ async def save_feedback_draft(data: FeedbackCreate):
             })
 
             return {"message": "draft updated", "id": str(existing_draft.id)}
+
+    find_feedback = await FeedbackDB.find_one({
+        FeedbackDB.employee_email: data.employee_email,
+        FeedbackDB.status: "draft"
+    })
+
+    if find_feedback:
+        raise HTTPException(status_code=400, detail=f"Already draft exists for { data.employee_email }")
 
     feedback = FeedbackDB(
         created_by_email=creator.email,
@@ -358,3 +374,14 @@ async def update_feedback(
     feedback.updated_at = datetime.utcnow()
     await feedback.save()
     return {"message": "feedback updated", "id": str(feedback.id)}
+
+
+@router.delete("/{feedback_id}", response_model=dict)
+async def delete_feedback(feedback_id: str = Path(...)):
+    
+    await (await FeedbackDB.get(feedback_id)).delete()
+    
+    return {
+        "feedbackId": feedback_id,
+        "status": "deleted"
+    }

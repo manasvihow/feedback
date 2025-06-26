@@ -1,6 +1,7 @@
 
 export default function NavBar({ onHomeClick, onLogout }) {
   return (
+    <div className="fixed w-[100%] z-[1200]" >
     <nav className="w-full px-6 py-3 bg-white border-b border-gray-100 shadow-sm">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         {/* Logo/Title - clickable for home */}
@@ -28,5 +29,6 @@ export default function NavBar({ onHomeClick, onLogout }) {
         </div>
       </div>
     </nav>
+    </div>
   );
 }

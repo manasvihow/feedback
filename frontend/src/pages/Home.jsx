@@ -32,7 +32,7 @@ const Home = () => {
 
     return (
         <>
-            <div className="min-h-screen w-full bg-[#F9F9F9]">
+            <div className="w-full bg-[#F9F9F9]">
                 <NavBar onHomeClick={handleResetView} onLogout={handleLogout} />
 
                 <div className="px-6 py-8">

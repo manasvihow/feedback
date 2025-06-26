@@ -29,7 +29,7 @@ async def register_user(user: UserCreateDTO):
     if existing:
         raise HTTPException(status_code=400, detail="User already exists")
     
-    new_user=UserDB(name=user.name, email=user.email, password_hashed=hash_password(user.password), role= user.role)
+    new_user=UserDB(name=user.name.title(), email=user.email, password_hashed=hash_password(user.password), role= user.role)
 
     try:
         await new_user.insert()
@@ -66,3 +66,13 @@ async def login(credentials: UserLoginDTO):
 # @router.get("/show-token")
 # async def token_data(current_user: UserDB = Depends(get_current_token)):
 #     return {"message": f"Hello {current_user.name}, your role is {current_user.role}"}
+
+@router.post("/bulk-register", response_model=List[UserPublicDTO])
+async def bulk_register(users: List[UserCreateDTO]):
+
+    collated_response = []
+
+    for user in users:
+        collated_response.append(await register_user(user))
+    
+    return collated_response
