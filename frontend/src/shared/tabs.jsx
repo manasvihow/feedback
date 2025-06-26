@@ -6,7 +6,7 @@ const Tabs = ({ tabs }) => {
 
   const filteredTabs = useMemo(() => {
     if(user?.role === "manager"){
-      return tabs.filter(tab => tab.label !== "Feedbacks Received");
+      return tabs.filter(tab => tab.label !== "Incoming Feedbacks");
     }
     return tabs;
   }, [tabs, user?.role]);
