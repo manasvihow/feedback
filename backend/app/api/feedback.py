@@ -169,7 +169,7 @@ async def get_all(email: str = Query(...)):
 
     print(name_feedbacks)
 
-    name_feedbacks.sort(key=lambda x: x.updated_at)
+    name_feedbacks.sort(key=lambda x: x.updated_at, reverse=True)
     return name_feedbacks
 
     

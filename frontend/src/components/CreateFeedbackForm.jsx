@@ -106,14 +106,9 @@ export default function CreateFeedbackForm({
         try {
             const res = await submitFeedback(payload);
             setSuccess(res.message);
-
-            if (status === "submitted") {
-                setTimeout(() => {
-                    onClose();
-                    setSuccess("");
-                    setRequestorEmail("");
-                }, 1500);
-            }
+            onClose();
+            setSuccess("");
+            setRequestorEmail("");
         } catch (err) {
             setError(err.message);
         }
@@ -315,7 +310,7 @@ export default function CreateFeedbackForm({
                         />
                     </div>
 
-                    <div className="flex items-center gap-3 mt-8">
+                    {user?.role !== "manager" && <div className="flex items-center gap-3 mt-8">
                         <input
                             type="checkbox"
                             name="is_anon"
@@ -326,7 +321,7 @@ export default function CreateFeedbackForm({
                         <label className="text-sm text-[#555555]">
                             Send Anonymously
                         </label>
-                    </div>
+                    </div>}
                 </div>
 
                 {/* Submit Buttons */}

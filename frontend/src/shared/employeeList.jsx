@@ -24,6 +24,8 @@ const EmployeeList = ({form, handleChange, handleFirstChange, isCreateForm}) => 
         fetchEmployeeList();
 
       },[]);
+    
+      console.log(form)
 
     return (
         <div>
@@ -40,6 +42,7 @@ const EmployeeList = ({form, handleChange, handleFirstChange, isCreateForm}) => 
                 required
                 className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#5D4E6D] focus:border-transparent"
             >
+                <option value="" disabled selected>Select an option</option>
                 {employeeList.map((emp) => {
                     return <option value={emp.email}>{emp.name}</option>;
                 })}

@@ -5,7 +5,7 @@ import { capitalizeFirstLetter } from "../../utils/helpers";
 
 export const Card = ({emp, children}) => {
     return(
-<div className="bg-white p-2 rounded-2xl mb-2 shadow-md border border-gray-100 max-w-xl">
+<div className="bg-white p-2 rounded-2xl mb-2 shadow-md border border-gray-100">
     <h1 className="text-2xl">{emp?.name}</h1>
     <div className="mb-2">{capitalizeFirstLetter(emp?.role) }</div>
     <div className="text-gray-500">{emp?.email}</div>
