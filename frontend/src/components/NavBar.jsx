@@ -45,7 +45,7 @@ export default function NavBar({
                             Create
                         </button>
                           
-                        {user?.role == "manager" && <button
+                        {user?.role === "manager" && <button
                             onClick={() => {
                                 onDashboardClick();
                             }}

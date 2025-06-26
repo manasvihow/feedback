@@ -82,14 +82,14 @@ export const Table = ({
                                     setCreate(
                                         ["draft", "requested"].includes(
                                             fb.status
-                                        ) && user.email == fb.creator_email
+                                        ) && user.email === fb.creator_email
                                             ? true
                                             : false
                                     );
                                 }}
                             >
                                 {fb.status === "requested" &&
-                                user.email == fb.creator_email
+                                user.email === fb.creator_email
                                     ? "Give Feedback"
                                     : fb.preview}
                             </td>

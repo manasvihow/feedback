@@ -1,6 +1,5 @@
-import { useEffect, useState, useContext, useMemo, useRef } from "react";
+import {useContext, useMemo } from "react";
 import { UserContext } from "../services/contexts";
-import CreateFeedbackForm from "./CreateFeedbackForm";
 import { Table } from "../shared/table";
 import Tabs from "../shared/tabs";
 import { MessageSquareShare, MessageSquareDot } from "lucide-react";
@@ -12,7 +11,7 @@ export default function FeedbackTable({ setSelectedFeedback, setCreate, feedback
 
         return [
             {
-                label: "Feedbacks Received",
+                label: "Incoming Feedbacks",
                 icon: MessageSquareDot,
                 content: (
                     <Table
@@ -40,7 +39,7 @@ export default function FeedbackTable({ setSelectedFeedback, setCreate, feedback
               ),
           }
         ];
-    }, [feedbacks, setCreate, handleDelete, setSelectedFeedback, user]);
+    }, [feedbacks, setCreate, handleDelete, setSelectedFeedback, user, setError]);
 
     return (
         <div className="font-sans">

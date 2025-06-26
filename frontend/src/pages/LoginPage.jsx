@@ -1,4 +1,4 @@
-import { useState, useContext } from "react";
+import { useState } from "react";
 import { Login } from "../services/login";
 
 export default function LoginPage({ setUser }) {

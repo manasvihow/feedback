@@ -165,8 +165,6 @@ async def get_all_analytics(user_email: str):
 
     for t in team:
         team_map[t.email] = t
-
-    print(team_map)
     
     raw_feedbacks = await FeedbackDB.find(FeedbackDB.created_by_email == user.email).to_list()
 

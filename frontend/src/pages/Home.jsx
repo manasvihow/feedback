@@ -14,7 +14,6 @@ const Home = () => {
     const [selectedFeedback, setSelectedFeedback] = useState(null);
     const { user, setUser } = useContext(UserContext);
     const [create, setCreate] = useState(false);
-    const [request, setRequest] = useState(false);
     const [requestorEmail, setRequestorEmail] = useState("");
     const [showRequesterModal, setShowRequesterModal] = useState(false);
     const [showDashboard, setShowDashboard] = useState(false);
@@ -107,7 +106,6 @@ const Home = () => {
                 <div className="px-16 py-8">
                     {!selectedFeedback &&
                         !create &&
-                        !request &&
                         !showDashboard && <WelcomeBanner />}
                     {error && (
                         <div className="text-red-500 mb-4 p-2 rounded bg-red-50">
@@ -152,7 +150,7 @@ const Home = () => {
                                     setError={setError}
                                 />
                             </div>
-                            {user?.role == "employee" && (
+                            {user?.role === "employee" && (
                                 <div className="lg:w-[320px]">
                                     <ActionButtons
                                         onRequest={() =>

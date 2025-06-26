@@ -167,8 +167,6 @@ async def get_all(email: str = Query(...)):
         )
         name_feedbacks.append(dto)
 
-    print(name_feedbacks)
-
     name_feedbacks.sort(key=lambda x: x.updated_at, reverse=True)
     return name_feedbacks
 

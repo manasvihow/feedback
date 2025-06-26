@@ -16,7 +16,7 @@ export default function Dashboard({onClose}) {
         }
 
         fetchAnalytics();
-    }, []);
+    }, [user?.email]);
 
     return (
         <div className="sm:px-6 lg:px-8 py-6 mt-12 bg-gray-50">

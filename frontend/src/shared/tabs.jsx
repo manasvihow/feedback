@@ -9,7 +9,7 @@ const Tabs = ({ tabs }) => {
       return tabs.filter(tab => tab.label !== "Feedbacks Received");
     }
     return tabs;
-  }, [tabs]);
+  }, [tabs, user?.role]);
 
   const [activeTab, setActiveTab] = useState(filteredTabs[0]?.label);
 

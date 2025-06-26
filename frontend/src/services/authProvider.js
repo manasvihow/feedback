@@ -1,6 +1,5 @@
-import Navbar from "../components/NavBar";
 import LoginPage from "../pages/LoginPage";
-import { ROLES, UserContext } from "./contexts";
+import {UserContext } from "./contexts";
 import { useState } from "react";
 
 const AuthProvider = ({children}) => {

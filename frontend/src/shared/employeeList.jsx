@@ -24,8 +24,6 @@ const EmployeeList = ({form, handleChange, handleFirstChange, isCreateForm}) => 
         fetchEmployeeList();
 
       },[]);
-    
-      console.log(form)
 
     return (
         <div>
