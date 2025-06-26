@@ -5,6 +5,7 @@ from typing import Literal, Optional, List
 from datetime import datetime
 from app.models.user import UserDB
 from app.models.team import TeamDB
+from beanie.operators import And, Or
 
 router = APIRouter(prefix="/feedback", tags=["feedback"])
 
@@ -87,8 +88,9 @@ class FeedbackListDTO(BaseModel):
     creator_email: str
     created_at: Optional[datetime]
     updated_at: Optional[datetime]
+    requested_at: Optional[datetime]
     employee_email: str
-    sentiment: Optional[Literal["positive", "negative", "neutral"]]
+    sentiment: Optional[Literal["positive", "negative", "neutral", ""]]
     status: Literal["requested", "draft", "submitted", "acknowledged"]
     preview: str  
 
@@ -110,19 +112,13 @@ async def get_all(email: str = Query(...)):
     name_feedbacks = []
 
     for fb in raw_feedbacks:
-        # skip draft feedbacks for employee
-        if user.email == fb.employee_email and fb.status == "draft":
-            continue
-
-        # determine names
-        employee_name = ""
         creator_name = "Anonymous" if fb.is_anon else fb.created_by_email
         creator_email = ""
         employee_email = fb.employee_email
+        employee = await UserDB.find_one(UserDB.email == fb.employee_email)
+        employee_name = employee.name if employee else "Invalid"
 
         if user.role == "manager":
-            employee = await UserDB.find_one(UserDB.email == fb.employee_email)
-            employee_name = employee.name if employee else "Invalid"
             creator_name = user.name
             creator_email = user.email
         elif user.role == "employee":
@@ -130,6 +126,24 @@ async def get_all(email: str = Query(...)):
             creator_name = creator.name if creator else "Invalid"
             creator_email = fb.created_by_email
         if fb.is_anon : creator_name = "Anonymous"
+
+        # skip draft feedbacks for employee
+        if user.email == fb.employee_email and fb.status == "draft":
+            dto = FeedbackListDTO(
+            id=str(fb.id),
+            employee_name=employee_name,
+            employee_email=employee_email,
+            creator_name=creator_name,
+            creator_email=creator_email,
+            sentiment="",
+            status=fb.status,
+            preview="",
+            created_at=fb.created_at,
+            updated_at=fb.updated_at,
+            requested_at=fb.requested_at
+            )
+            name_feedbacks.append(dto)
+            continue
 
         # prepare preview
         if fb.status == "requested":
@@ -148,7 +162,8 @@ async def get_all(email: str = Query(...)):
             status=fb.status,
             preview=preview,
             created_at=fb.created_at,
-            updated_at=fb.updated_at
+            updated_at=fb.updated_at,
+            requested_at=fb.requested_at
         )
         name_feedbacks.append(dto)
 
@@ -260,10 +275,15 @@ async def request_feedback(data: FeedbackRequestDTO):
         raise HTTPException(status_code=400, detail="You can only request feedback from your team members")
 
     existing = await FeedbackDB.find_one(
-        FeedbackDB.created_by_email == giver.email,
-        FeedbackDB.employee_email == requestor.email,
-        FeedbackDB.status == "requested"
+            And(
+        {"created_by_email": giver.email},
+        {"employee_email": requestor.email},
+        Or(
+            {"status": "requested"},
+            {"status": "draft"}
+        )
     )
+        )
 
 
     if existing:

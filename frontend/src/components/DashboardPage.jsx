@@ -36,7 +36,7 @@ export default function Dashboard({onClose}) {
                 <div>
                     <TeamMemberList />
                 </div>
-                <div className="col-span-3 h-2/3 overflow-scroll">
+                <div className="col-span-3">
                     <FeedbackDashboard feedbackAnalytics={feedbackAnalytics} />
                 </div>
             </div>

@@ -3,14 +3,19 @@ import { Required } from "./required";
 import { UserContext } from "../services/contexts";
 import { getEmployeeList } from "../services/dashboard";
 
-const EmployeeList = ({form, handleChange, handleFirstChange}) => {
+const EmployeeList = ({form, handleChange, handleFirstChange, isCreateForm}) => {
     const {user } = useContext(UserContext);
     const [employeeList, setEmployeeList] = useState([]);
 
     useEffect(() => {
         async function fetchEmployeeList(){
           const data = await getEmployeeList(user?.email);
-          setEmployeeList(data);
+            
+          if(isCreateForm){
+            setEmployeeList(data.filter(emp => emp.role !== "manager"));
+          } else {
+            setEmployeeList(data);
+          }
         if(handleFirstChange){
             handleFirstChange(data[0].email);
         }
@@ -24,7 +29,7 @@ const EmployeeList = ({form, handleChange, handleFirstChange}) => {
         <div>
             <div className="flex">
                 <label className="block text-sm font-medium text-[#555555] mb-2">
-                    Employee Email
+                    Employee
                 </label>
                 <Required />
             </div>

@@ -28,7 +28,7 @@ export default function CreateFeedbackForm({
     });
 
     useEffect(() => {
-      if(!selectedFeedback) return;
+        if (!selectedFeedback) return;
         async function fetchFeedback() {
             try {
                 const {
@@ -61,12 +61,14 @@ export default function CreateFeedbackForm({
         useState("write");
 
     useEffect(() => {
-      if(timeoutIdRef.current){
-        clearTimeout(timeoutIdRef.current)
-      }
-      timeoutIdRef.current = setTimeout(() => {setSuccess("")}, 5000);
-    }, [success])
-    
+        if (timeoutIdRef.current) {
+            clearTimeout(timeoutIdRef.current);
+        }
+        timeoutIdRef.current = setTimeout(() => {
+            setSuccess("");
+        }, 5000);
+    }, [success]);
+
     useEffect(() => {
         const resizeTextarea = (textarea) => {
             if (textarea) {
@@ -96,7 +98,9 @@ export default function CreateFeedbackForm({
             created_by_email: user?.email,
             feedbackId: selectedFeedback?.id || "",
             status,
-            tags: Array.isArray(form.tags) ? form.tags : form.tags.split(",").map((t) => t.trim()),
+            tags: Array.isArray(form.tags)
+                ? form.tags
+                : form.tags.split(",").map((t) => t.trim()),
         };
 
         try {
@@ -131,15 +135,34 @@ export default function CreateFeedbackForm({
 
             <form className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <EmployeeList handleFirstChange={(data) => {
-                        handleChange({target: {name: "employee_email", value: data}})
-                    }} form={form} handleChange={handleChange}/>
+                    {selectedFeedback?.status === "requested" ? (
+                        <div>
+                            <label className="block text-sm font-medium text-[#555555] mb-2">
+                                Employee
+                            </label>
+                            {selectedFeedback.employee_name}
+                        </div>
+                    ) : (
+                        <EmployeeList
+                            isCreateForm={true}
+                            handleFirstChange={(data) => {
+                                handleChange({
+                                    target: {
+                                        name: "employee_email",
+                                        value: data,
+                                    },
+                                });
+                            }}
+                            form={form}
+                            handleChange={handleChange}
+                        />
+                    )}
                     <div>
-                    <div className="flex">
-                        <label className="block text-sm font-medium text-[#555555] mb-2">
-                            Sentiment
-                        </label>
-                        <Required />
+                        <div className="flex">
+                            <label className="block text-sm font-medium text-[#555555] mb-2">
+                                Sentiment
+                            </label>
+                            <Required />
                         </div>
                         <select
                             name="sentiment"
@@ -157,11 +180,11 @@ export default function CreateFeedbackForm({
                 {/* Strengths Field */}
                 <div>
                     <label className="flex justify-between items-center text-sm font-medium mb-2">
-                    <div className="flex">
-                        <h1 className="block text-sm font-medium text-[#555555]">
-                            Strengths
-                        </h1>
-                        <Required />
+                        <div className="flex">
+                            <h1 className="block text-sm font-medium text-[#555555]">
+                                Strengths
+                            </h1>
+                            <Required />
                         </div>
                         <div className="flex">
                             <button
@@ -217,11 +240,11 @@ export default function CreateFeedbackForm({
                 {/* Areas to Improve */}
                 <div>
                     <label className="flex justify-between items-center text-sm font-medium mb-2">
-                    <div className="flex">
-                        <h1 className="block text-sm font-medium text-[#555555]">
-                            Areas to improve
-                        </h1>
-                        <Required />
+                        <div className="flex">
+                            <h1 className="block text-sm font-medium text-[#555555]">
+                                Areas to improve
+                            </h1>
+                            <Required />
                         </div>
                         <div className="flex">
                             <button

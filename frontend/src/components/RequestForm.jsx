@@ -51,7 +51,7 @@ export default function RequestForm({ setRequestorEmail, onBack }) {
             </h2>
 
             <form onSubmit={handleSubmit} className="space-y-4">
-                <EmployeeList form={{employee_email: giverEmail}} handleChange={(e) => {
+                <EmployeeList isCreateForm={false} form={{employee_email: giverEmail}} handleChange={(e) => {
                   setGiverEmail(e.target.value)
                 }}
                   handleFirstChange={(data) => {
