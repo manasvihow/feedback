@@ -17,6 +17,8 @@ const Home = () => {
     const [requestorEmail, setRequestorEmail] = useState("");
     const [showRequesterModal, setShowRequesterModal] = useState(false);
     const [showDashboard, setShowDashboard] = useState(false);
+    const [selectedPage, setSelectedPage] = useState("Home");
+    
 
     const handleResetView = () => {
         setSelectedFeedback(null);
@@ -33,18 +35,22 @@ const Home = () => {
     return (
         <>
             <div className="w-full bg-[#F9F9F9]">
-                <NavBar onHomeClick={handleResetView} onLogout={handleLogout} />
+                <NavBar selectedPage={selectedPage} onHomeClick={() => {handleResetView(); setSelectedPage("Home")}} onCreateClick={() => {setShowDashboard(false); setCreate(true); setSelectedPage("Create")}} onDashboardClick={() => {setShowDashboard(true); setCreate(false); setSelectedPage("Dashboard")}} onLogout={handleLogout} />
 
-                <div className="px-6 py-8">
-                    {!selectedFeedback && !create && !request && !showDashboard && (
-                        <WelcomeBanner />
-                    )}
+                <div className="px-20 py-8">
+                    {!selectedFeedback &&
+                        !create &&
+                        !request &&
+                        !showDashboard && <WelcomeBanner />}
 
-                    {showDashboard ? <Dashboard /> : create ? (
-                        <CreateFeedbackForm
+                    {showDashboard ? (
+                        <Dashboard onClose={() => {setShowDashboard(false); setSelectedPage("Home")}} />
+                    ) : create ? (
+                        <CreateFeedbackForm setSelectedPage={() => setSelectedPage("Create")}
                             setRequestorEmail={setRequestorEmail}
                             requestorEmail={selectedFeedback?.employee_email}
                             onClose={() => {
+                                setSelectedPage("Home")
                                 setSelectedFeedback(null);
                                 setCreate(false);
                             }}
@@ -52,6 +58,7 @@ const Home = () => {
                         />
                     ) : selectedFeedback ? (
                         <FeedbackDetail
+                            
                             id={selectedFeedback?.id}
                             email={user?.email}
                             onBack={() => setSelectedFeedback(null)}
@@ -66,7 +73,7 @@ const Home = () => {
                                     setSelectedFeedback={setSelectedFeedback}
                                 />
                             </div>
-                            <div className="lg:w-[320px]">
+                            {user?.role == "employee" && <div className="lg:w-[320px]">
                                 <ActionButtons
                                     onRequest={() =>
                                         setShowRequesterModal(true)
@@ -74,7 +81,8 @@ const Home = () => {
                                     onCreate={() => setCreate(true)}
                                     onDashboard={() => setShowDashboard(true)}
                                 />
-                            </div>
+                            </div>}
+                            
                         </div>
                     )}
                 </div>

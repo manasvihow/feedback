@@ -129,6 +129,7 @@ async def get_all(email: str = Query(...)):
             creator = await UserDB.find_one(UserDB.email == fb.created_by_email)
             creator_name = creator.name if creator else "Invalid"
             creator_email = fb.created_by_email
+        if fb.is_anon : creator_name = "Anonymous"
 
         # prepare preview
         if fb.status == "requested":

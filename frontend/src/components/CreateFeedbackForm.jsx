@@ -116,7 +116,7 @@ export default function CreateFeedbackForm({
     };
 
     return (
-        <div className="w-full bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+        <div className="w-full mt-12 bg-white p-6 rounded-xl shadow-sm border border-gray-100">
             <div className="flex justify-between items-center mb-6">
                 <h2 className="text-xl font-semibold text-[#5C2849]">
                     Create Feedback
@@ -125,7 +125,7 @@ export default function CreateFeedbackForm({
                     onClick={onClose}
                     className="text-[#555555] hover:text-[#5C2849]"
                 >
-                    ← Back to Feedback
+                    ← Back to Home
                 </button>
             </div>
 

@@ -45,14 +45,14 @@ export default function FeedbackDetail({ id, onBack }) {
   return (
     <div
       ref={pdfRef}
-      className="w-full bg-white p-6 rounded-xl shadow-sm border border-gray-100 max-w-4xl mx-auto"
+      className="w-full mt-12 bg-white p-6 rounded-xl shadow-sm border border-gray-100 max-w-4xl mx-auto"
     >
       <div className="flex justify-between items-center mb-6">
         <button
           onClick={onBack}
           className="text-[#555555] hover:text-[#5C2849] text-sm"
         >
-          ← Back to Feedback
+          ← Back to Home
         </button>
         <button
           className="px-4 py-2 bg-[#5D4E6D] text-white rounded-lg hover:bg-[#4A3D56] text-sm"

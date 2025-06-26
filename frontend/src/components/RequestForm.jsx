@@ -41,7 +41,7 @@ export default function RequestForm({ setRequestorEmail, onBack }) {
         <div className="bg-white p-6 rounded-2xl shadow-md border border-gray-100 max-w-xl">
             <button
                 onClick={onBack}
-                className="text-[#555555] hover:text-[#5C2849]"
+                className="text-[#555555] hover:text-[#5C2849] mb-4"
             >
                 ← Back to Feedback
             </button>
