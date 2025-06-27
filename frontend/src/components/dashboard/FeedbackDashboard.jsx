@@ -34,7 +34,7 @@ const FeedbackDashboard = ({feedbackAnalytics}) => {
         <div className="col-span-2"><Card emp={{name: "Drafts", role: draft, email:""}} /></div>
   
         {/* Sentiment Pie Chart */}
-        <div className="col-span-3 md:col-span-3">
+        <div className="col-span-3">
         <Card>
             <p className="text-lg font-semibold mb-2">Sentiment Distribution (of submitted feedbacks)</p>
             <ResponsiveContainer width="100%" height={250}>
@@ -51,7 +51,7 @@ const FeedbackDashboard = ({feedbackAnalytics}) => {
         </div>
   
         {/* Status Bar Chart */}
-        <div className="col-span-3 md:col-span-3">
+        <div className="col-span-3">
         <Card>
             <p className="text-lg font-semibold mb-2">Feedback by Status</p>
             <ResponsiveContainer width="100%" height={250}>
@@ -65,29 +65,33 @@ const FeedbackDashboard = ({feedbackAnalytics}) => {
         </Card>
                     </div>
         {/* Recent Feedback Table */}
-        <div className="col-span-6">
-        <Card >
+        <div className="col-span-6 w-full">
+        <Card>
             <p className="text-lg font-semibold mb-2">Latest Feedback Entries</p>
             <table className="w-full text-sm">
               <thead>
                 <tr className="text-left border-b">
-                  <th className="py-2">Employee</th>
-                  <th>Sentiment</th>
-                  <th>Status</th>
-                  <th>Created At</th>
+                  <th className="py-2 w-1/5">Employee</th>
+                  <th className="py-2 w-1/5">Sentiment</th>
+                  <th className="py-2 w-1/5">Status</th>
+                  <th className="py-2 w-2/5">Created At</th>
                 </tr>
               </thead>
+            </table>
+            <div className="max-h-28 overflow-scroll">
+            <table className="w-full text-sm">
               <tbody>
                 {feedbackAnalytics.map(entry => (
-                  <tr key={entry.id} className="border-b">
-                    <td className="py-2">{entry.employee_name}</td>
-                    <td>{entry.sentiment}</td>
-                    <td>{entry.status}</td>
-                    <td>{new Date(entry.created_at).toLocaleString()}</td>
+                  <tr key={entry.id} className="border-b text-left">
+                    <td className="py-2 w-1/5">{entry.employee_name}</td>
+                    <td className="py-2 w-1/5">{entry.sentiment}</td>
+                    <td className="py-2 w-1/5">{entry.status}</td>
+                    <td className="py-2 w-2/5">{new Date(entry.created_at).toLocaleString()}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
+            </div>
         </Card>
         </div>
       </div>

@@ -9,7 +9,6 @@ export default function NavBar({
     onLogout,
 }) {
   const user = useContext(UserContext).user;
-  console.log(user);
     return (
       
         <div className="fixed w-[100%] z-[1200]">
@@ -46,7 +45,7 @@ export default function NavBar({
                             Create
                         </button>
                           
-                        {user?.role == "manager" && <button
+                        {user?.role === "manager" && <button
                             onClick={() => {
                                 onDashboardClick();
                             }}

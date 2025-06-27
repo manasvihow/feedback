@@ -1,4 +1,4 @@
-from fastapi import Depends, APIRouter, HTTPException
+from fastapi import Depends, APIRouter, HTTPException, Query
 from app.models.user import UserDB
 from pydantic import BaseModel, EmailStr
 from typing import List, Literal
@@ -58,7 +58,10 @@ async def login(credentials: UserLoginDTO):
 
 
 @router.post("/bulk-register", response_model=List[UserPublicDTO])
-async def bulk_register(users: List[UserCreateDTO]):
+async def bulk_register(users: List[UserCreateDTO], admin_email: str = Query(...)):
+    admin = await UserDB.find_one(UserDB.email == admin_email)
+    if not admin or admin.role != "admin":
+        raise HTTPException(status_code=403, detail="Only admins can create teams")
 
     collated_response = []
 

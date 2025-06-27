@@ -16,7 +16,7 @@ export default function Dashboard({onClose}) {
         }
 
         fetchAnalytics();
-    }, []);
+    }, [user?.email]);
 
     return (
         <div className="sm:px-6 lg:px-8 py-6 mt-12 bg-gray-50">
@@ -32,11 +32,11 @@ export default function Dashboard({onClose}) {
                 </button>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+            <div className="grid grid-cols-4 gap-6 mb-6">
                 <div>
                     <TeamMemberList />
                 </div>
-                <div className="col-span-3 h-2/3 overflow-scroll">
+                <div className="col-span-3">
                     <FeedbackDashboard feedbackAnalytics={feedbackAnalytics} />
                 </div>
             </div>
