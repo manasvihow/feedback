@@ -136,7 +136,3 @@ class FeedbackDB(Document):
     updated_at: Optional[datetime]
     acknowledged_at: Optional[datetime]
 ```
-
----
-
-Let me know if you want to add more details or further customize the README!
