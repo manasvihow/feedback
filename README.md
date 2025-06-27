@@ -137,5 +137,5 @@ class FeedbackDB(Document):
     acknowledged_at: Optional[datetime]
 ```
 
-### AI
+## 5. AI
 Minimal use of AI tools (like ChatGPT) was made for refining documentation and clarifying code structure decisions.
