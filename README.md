@@ -2,41 +2,120 @@
 
 FeedLoop is a full-stack feedback management platform for teams, enabling managers and employees to exchange, request, and track feedback efficiently. The project consists of a FastAPI backend and a React frontend.
 
----
-
 ## 1. Setup Instructions
 
 ### Backend
 
-1. **Install dependencies**  
+1. **Install dependencies**
+
    ```bash
    cd backend
    pip install -r requirements.txt
    ```
-2. **Set up environment variables**  
+
+2. **Set up environment variables**
    Create a `.env` file in `backend/` with your MongoDB connection details:
+
    ```
    MONGO_URI=mongodb://localhost:27017
    DATABASE_NAME=feedback_db
    SECRET_KEY=your_secret
    ```
-3. **Run the backend server**  
+
+3. **Run the backend server**
+
    ```bash
    uvicorn app.main:app --reload
    ```
 
+4. **🔧 Initial Setup Before Frontend**
+   
+   Before using the frontend, perform the following initial setup using the Swagger UI or an API client like Thunder Client or Postman:
+
+
+   1. ##### Open API Docs
+
+      Go to [http://localhost:8000/docs](http://localhost:8000/docs) to explore all backend endpoints.
+
+
+   2. ##### Register an Admin
+
+      Use the `/user/register` endpoint to register a user with `"role": "admin"`.
+
+      Sample JSON:
+
+      ```json
+      {
+      "name": "ADMIN",
+      "email": "admin@example.com",
+      "password": "admin123",
+      "role": "admin"
+      }
+      ```
+
+   3. ##### Bulk Register Users
+
+      Use the `/user/bulk-register` endpoint to register multiple employees and managers at once. You will need to pass a query : admin_email: "admin@example.com" since only admin can register users.
+
+      Sample JSON:
+
+      ```json
+      [
+      {
+         "name": "Steve Rogers",
+         "email": "steve@avengers.com",
+         "password": "avengers123",
+         "role": "manager"
+      },
+      {
+         "name": "Tony Stark",
+         "email": "tony@avengers.com",
+         "password": "avengers123",
+         "role": "manager"
+      },
+      {
+         "name": "Natasha Romanoff",
+         "email": "natasha@avengers.com",
+         "password": "avengers123",
+         "role": "employee"
+      }
+      ]
+      ```
+
+   4. ##### Create a Team
+
+      Use the `/team/create` endpoint to assign a manager and their team members. You will need to pass a query : admin_email: "admin@example.com" since only admin can create teams.
+
+      Sample JSON:
+
+      ```json
+      {
+      "manager_email": "tony@avengers.com",
+      "member_emails": ["steve@avengers.com"]
+      }
+      ```
+
+   #### After completing the steps above, you're ready to start using the frontend!
+
+
+
 ### Frontend
 
-1. **Install dependencies**  
+1. **Install dependencies**
+
    ```bash
    cd frontend
    npm install
    ```
-2. **Start the frontend**  
+2. **Start the frontend**
+
    ```bash
    npm start
    ```
+
    The app will be available at [http://localhost:3000](http://localhost:3000).
+
+
 
 ### Docker (Backend)
 

@@ -1,0 +1,33 @@
+version: "3.9"
+
+services:
+  backend:
+    build: .
+    container_name: feedback_backend
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    depends_on:
+      - mongo
+    networks:
+      - feedback_network
+
+  mongo:
+    image: mongo
+    container_name: feedback_mongo
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: mongoadmin
+      MONGO_INITDB_ROOT_PASSWORD: usertest123
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - feedback_network
+
+volumes:
+  mongo_data:
+
+networks:
+  feedback_network:

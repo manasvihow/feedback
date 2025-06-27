@@ -17,6 +17,11 @@ class UserCreateDTO(BaseModel):
     password: str
     role: Literal["manager", "employee", "admin"]
 
+class UserPublicDTO(BaseModel):
+    name: str
+    email: EmailStr
+    role: str
+
 @router.post("/register", response_model=UserPublicDTO)
 async def register_user(user: UserCreateDTO):
     existing = await UserDB.find_one(UserDB.email == user.email)
@@ -36,10 +41,7 @@ async def register_user(user: UserCreateDTO):
 
 
 # Login User
-class UserPublicDTO(BaseModel):
-    name: str
-    email: EmailStr
-    role: str
+
 
 class UserLoginDTO(BaseModel):
     email: EmailStr
