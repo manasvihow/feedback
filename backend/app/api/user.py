@@ -6,22 +6,16 @@ import base64
 import os
 from app.utils.auth import hash_password, verify_password
 from datetime import timedelta
-from app.core.config import ACCESS_TOKEN_EXPIRE_MINUTES
+
 
 router = APIRouter(prefix="/user", tags=["user"])
 
+# Register User 
 class UserCreateDTO(BaseModel):
     name: str
     email: EmailStr
     password: str
     role: Literal["manager", "employee", "admin"]
-
-
-class UserPublicDTO(BaseModel):
-    name: str
-    email: EmailStr
-    role: str
-
 
 @router.post("/register", response_model=UserPublicDTO)
 async def register_user(user: UserCreateDTO):
@@ -40,14 +34,12 @@ async def register_user(user: UserCreateDTO):
     noPasswordUser = UserPublicDTO(name=new_user.name, email=new_user.email, role=new_user.role)
     return noPasswordUser
 
-@router.get("/all", response_model=List[UserPublicDTO])
-async def getAllUsers():
-    return await UserDB.find_all(projection_model=UserPublicDTO).to_list() 
 
-
-class TokenDTO(BaseModel):
-    access_token: str
-    token_type: str
+# Login User
+class UserPublicDTO(BaseModel):
+    name: str
+    email: EmailStr
+    role: str
 
 class UserLoginDTO(BaseModel):
     email: EmailStr
@@ -63,9 +55,7 @@ async def login(credentials: UserLoginDTO):
     
     return {"name": existing.name, "email": existing.email, "role": existing.role}
 
-# @router.get("/show-token")
-# async def token_data(current_user: UserDB = Depends(get_current_token)):
-#     return {"message": f"Hello {current_user.name}, your role is {current_user.role}"}
+
 
 @router.post("/bulk-register", response_model=List[UserPublicDTO])
 async def bulk_register(users: List[UserCreateDTO]):
@@ -76,3 +66,8 @@ async def bulk_register(users: List[UserCreateDTO]):
         collated_response.append(await register_user(user))
     
     return collated_response
+
+
+@router.get("/all", response_model=List[UserPublicDTO])
+async def getAllUsers():
+    return await UserDB.find_all(projection_model=UserPublicDTO).to_list() 

@@ -37,7 +37,7 @@ const Home = () => {
             <div className="w-full bg-[#F9F9F9]">
                 <NavBar selectedPage={selectedPage} onHomeClick={() => {handleResetView(); setSelectedPage("Home")}} onCreateClick={() => {setShowDashboard(false); setCreate(true); setSelectedPage("Create")}} onDashboardClick={() => {setShowDashboard(true); setCreate(false); setSelectedPage("Dashboard")}} onLogout={handleLogout} />
 
-                <div className="px-20 py-8">
+                <div className="px-10 py-8">
                     {!selectedFeedback &&
                         !create &&
                         !request &&

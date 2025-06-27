@@ -6,14 +6,14 @@ from datetime import datetime
 class FeedbackDB(Document):
     created_by_email: str
     created_by_role: str
-    is_anon: bool = False
     employee_email: str
+    sentiment: Optional[Literal["positive", "negative", "neutral"]] = None
     strengths: str
     areas_to_improve: str
-    sentiment: Optional[Literal["positive", "negative", "neutral"]] = None
     tags: Optional[List[str]] = []
+    is_anon: bool = False
     status: Literal["requested", "draft", "submitted", "acknowledged"]
-
+    
     requested_at: Optional[datetime]
     created_at: Optional[datetime]
     updated_at: Optional[datetime]

@@ -37,6 +37,8 @@ async def create_feedback(data: FeedbackCreate):
 
     employee_team = await TeamDB.find_one(TeamDB.member_emails == employee.email)
 
+    # edge cases
+    
     if employee_team != creator_team:
         raise HTTPException(status_code=400, detail="You can only send feedbacks to your team members")
     if creator.role == "manager" and data.is_anon:

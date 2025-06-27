@@ -89,7 +89,8 @@ async def get_team_members(user_email: str = Query(...)):
         raise HTTPException(status_code=404, detail="User is not part of any team")
 
     # get all member and manager emails
-    all_emails = list(set(team.member_emails))
+    all_emails = list(set(team.member_emails + [team.manager_email]))
+
     all_emails = filter(lambda email: email != user_email, all_emails)
     users = await UserDB.find({"email": {"$in": all_emails}}).to_list()
 
