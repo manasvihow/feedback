@@ -1,160 +1,134 @@
 # FeedLoop
 
-FeedLoop is a full-stack feedback management platform for teams, enabling managers and employees to exchange, request, and track feedback efficiently. The project consists of a FastAPI backend and a React frontend.
+FeedLoop is a full-stack feedback management platform for teams, enabling managers and employees to exchange, request, and track feedback efficiently. It includes:
 
-## 1. Setup Instructions
+* FastAPI backend
+* React frontend
+* Dockerized setup for local development
 
-### Backend
+---
 
-1. **Install dependencies**
+## 1. Setup Instructions (Local Development)
 
-   ```bash
-   cd backend
-   pip install -r requirements.txt
-   ```
+### Backend (Local)
 
-2. **Set up environment variables**
-   Create a `.env` file in `backend/` with your MongoDB connection details:
+1. Install Dependencies
 
-   ```
-   MONGO_URI=mongodb://localhost:27017
-   DATABASE_NAME=feedback_db
-   SECRET_KEY=your_secret
-   ```
+```bash
+cd backend
+pip install -r requirements.txt
+```
 
-3. **Run the backend server**
+2. Configure Environment Variables
 
-   ```bash
-   uvicorn app.main:app --reload
-   ```
+Create a `.env` file inside the `backend/` directory:
 
-4. **🔧 Initial Setup Before Frontend**
-   
-   Before using the frontend, perform the following initial setup using the Swagger UI or an API client like Thunder Client or Postman:
+```
+MONGO_URI=mongodb://localhost:27017
+DATABASE_NAME=feedback_db
+SECRET_KEY=your_secret
+```
 
+3. Run the Backend Server
 
-   1. ##### Open API Docs
+```bash
+uvicorn app.main:app --reload
+```
 
-      Go to [http://localhost:8000/docs](http://localhost:8000/docs) to explore all backend endpoints.
+4. Initial Setup (Before Using Frontend)
 
+Use Swagger UI or tools like Postman/Thunder Client:
 
-   2. ##### Register an Admin
+* Open API Docs
 
-      Use the `/user/register` endpoint to register a user with `"role": "admin"`.
+  * Visit: [http://localhost:8000/docs](http://localhost:8000/docs)
 
-      Sample JSON:
+* Register an Admin
 
-      ```json
-      {
-      "name": "ADMIN",
-      "email": "admin@example.com",
-      "password": "admin123",
-      "role": "admin"
-      }
-      ```
+  * Endpoint: POST /user/register
+  * Sample Payload:
 
-   3. ##### Bulk Register Users
+```json
+{
+  "name": "ADMIN",
+  "email": "admin@example.com",
+  "password": "admin123",
+  "role": "admin"
+}
+```
 
-      Use the `/user/bulk-register` endpoint to register multiple employees and managers at once. You will need to pass a query : admin_email: "admin@example.com" since only admin can register users.
+* Bulk Register Users
 
-      Sample JSON:
+  * Endpoint: POST /user/bulk-register?admin\_email=[admin@example.com](mailto:admin@example.com)
+  * Sample Payload:
 
-      ```json
-      [
-      {
-         "name": "Steve Rogers",
-         "email": "steve@avengers.com",
-         "password": "avengers123",
-         "role": "manager"
-      },
-      {
-         "name": "Tony Stark",
-         "email": "tony@avengers.com",
-         "password": "avengers123",
-         "role": "manager"
-      },
-      {
-         "name": "Natasha Romanoff",
-         "email": "natasha@avengers.com",
-         "password": "avengers123",
-         "role": "employee"
-      }
-      ]
-      ```
+```json
+[
+  {
+    "name": "Steve Rogers",
+    "email": "steve@avengers.com",
+    "password": "avengers123",
+    "role": "manager"
+  },
+  {
+    "name": "Tony Stark",
+    "email": "tony@avengers.com",
+    "password": "avengers123",
+    "role": "manager"
+  },
+  {
+    "name": "Natasha Romanoff",
+    "email": "natasha@avengers.com",
+    "password": "avengers123",
+    "role": "employee"
+  }
+]
+```
 
-   4. ##### Create a Team
+* Create a Team
 
-      Use the `/team/create` endpoint to assign a manager and their team members. You will need to pass a query : admin_email: "admin@example.com" since only admin can create teams.
+  * Endpoint: POST /team/create?admin\_email=[admin@example.com](mailto:admin@example.com)
+  * Sample Payload:
 
-      Sample JSON:
-
-      ```json
-      {
-      "manager_email": "tony@avengers.com",
-      "member_emails": ["steve@avengers.com"]
-      }
-      ```
-
-   #### After completing the steps above, you're ready to start using the frontend!
-
-
+```json
+{
+  "manager_email": "tony@avengers.com",
+  "member_emails": ["steve@avengers.com"]
+}
+```
 
 ### Frontend
 
-1. **Install dependencies**
+1. Install Dependencies
 
-   ```bash
-   cd frontend
-   npm install
-   ```
-2. **Start the frontend**
+```bash
+cd frontend
+npm install
+```
 
-   ```bash
-   npm start
-   ```
+2. Start the Frontend
 
-   The app will be available at [http://localhost:3000](http://localhost:3000).
+```bash
+npm start
+```
 
+App will run at: [http://localhost:3000](http://localhost:3000)
 
+---
 
-### Docker (Backend)
+## 2. Optional: Docker Setup for Backend
 
-To run the backend in Docker:
+### Run Backend in Docker
+
 ```bash
 cd backend
-docker build -t feedback-backend .
-docker run -p 8000:8000 --env-file .env feedback-backend
+docker build .
+docker compose up
 ```
 
----
+### Dockerfile (Backend)
 
-## 2. Stack and Design Decisions
-
-- **Backend:**  
-  - FastAPI for REST APIs.
-  - MongoDB (via Beanie ODM) for flexible, document-based storage.
-  - Pydantic for data validation.
-  - Uvicorn as the ASGI server.
-  - CORS enabled for frontend-backend communication.
-
-- **Frontend:**  
-  - React (bootstrapped with Create React App).
-  - Tailwind CSS for styling.
-  - Context API for user/session management.
-  - Fetch API for backend communication.
-
-- **Design Decisions:**  
-  - Role-based access: `admin`, `manager`, `employee`.
-  - Feedback can be anonymous or attributed.
-  - Managers can view analytics and team feedback.
-  - Employees can request and acknowledge feedback.
-  - Modular API structure: `/user`, `/team`, `/feedback`, `/dashboard`.
-
----
-
-## 3. Dockerfile Explanation (Backend)
-
-```
+```Dockerfile
 FROM python:3
 
 WORKDIR /code
@@ -169,27 +143,83 @@ EXPOSE 8000
 
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
 ```
-- Uses the official Python 3 image.
-- Sets `/code` as the working directory.
-- Installs dependencies from `requirements.txt`.
-- Copies the application code and environment file.
-- Exposes port 8000 for FastAPI.
-- Starts the server with Uvicorn.
+
+### Docker Compose Configuration
+
+This project uses Docker Compose to manage:
+
+#### 1. MongoDB
+
+* Image: mongo
+* Container Name: feedback\_mongo
+* Ports: 27017:27017
+* Command: mongod --noauth (for development only)
+* Volumes: mongo\_data:/data/db
+
+#### 2. Backend
+
+* Builds the image from Dockerfile
+* Container Name: feedback\_backend
+* Ports: 8000:8000
+* Environment Variables:
+
+```
+MONGO_URI=mongodb://mongo:27017
+DATABASE_NAME=feedback_db
+```
+
+* Depends on: mongo (ensures MongoDB starts first)
+
+#### Volumes Declaration
+
+```yaml
+volumes:
+  mongo_data:
+```
 
 ---
 
-## 4. DB Schema Details
+## 3. Tech Stack and Design Decisions
+
+### Backend
+
+* FastAPI
+* MongoDB with Beanie ODM
+* Pydantic
+* Uvicorn
+* CORS for cross-origin requests
+
+### Frontend
+
+* React (CRA)
+* Tailwind CSS
+* Context API
+* Fetch API
+
+### Design Decisions
+
+* Roles: admin, manager, employee
+* Supports anonymous and named feedback
+* Managers get analytics and feedback dashboards
+* Employees can request and acknowledge feedback
+* Modular API structure: /user, /team, /feedback, /dashboard
+
+---
+
+## 4. Database Schema
 
 ### User (`users` collection)
+
 ```python
 class UserDB(Document):
     name: str
-    email: EmailStr (unique)
+    email: EmailStr
     password_hashed: str
     role: Literal["manager", "employee", "admin"]
 ```
 
 ### Team (`teams` collection)
+
 ```python
 class TeamDB(Document):
     manager_email: EmailStr
@@ -199,6 +229,7 @@ class TeamDB(Document):
 ```
 
 ### Feedback (`feedback` collection)
+
 ```python
 class FeedbackDB(Document):
     created_by_email: str
@@ -207,7 +238,7 @@ class FeedbackDB(Document):
     employee_email: str
     strengths: str
     areas_to_improve: str
-    sentiment: Optional["positive", "negative", "neutral"]
+    sentiment: Optional[Literal["positive", "negative", "neutral"]]
     tags: Optional[List[str]]
     status: Literal["requested", "draft", "submitted", "acknowledged"]
     requested_at: Optional[datetime]
@@ -216,5 +247,12 @@ class FeedbackDB(Document):
     acknowledged_at: Optional[datetime]
 ```
 
+---
+
 ## 5. AI
-Minimal use of AI tools (like ChatGPT) was made for refining documentation and clarifying code structure decisions.
+
+Minimal use of AI tools (like ChatGPT) was made for:
+
+* Refining documentation
+* Clarifying code structure
+* Improving naming consistency
